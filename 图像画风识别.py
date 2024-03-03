@@ -5,6 +5,7 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 import time
 from torchvision.models import resnet18
+import matplotlib.pyplot as plt
 
 # 加载数据集
 transform = transforms.Compose([
@@ -30,9 +31,11 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 # 训练模型
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
-for epoch in range(10):  # 这里我们只训练10轮，你可以根据需要调整
+loss_values = []  # to store loss values
+for epoch in range(3):  # 这里我们只训练10轮，你可以根据需要调整
     running_loss = 0.0
     start_time = time.time()
+    last_time = time.time()
     i=0 
     for inputs, labels in dataloader:
         inputs = inputs.to(device)
@@ -47,9 +50,21 @@ for epoch in range(10):  # 这里我们只训练10轮，你可以根据需要调
         loss.backward()
         optimizer.step()
 
-        if i%100==0:
-            print(f'Epoch {epoch+1}/{10} Step [{i}/{len(dataloader)}] Loss: {loss.item():.4f} Time: {time.time()-start_time:.4f}s')\
+        running_loss += loss.item()
 
-        #running_loss += loss.item() * inputs.size(0)
-    #epoch_loss = running_loss / len(dataset)
-    #print(f'Epoch {epoch+1}/{10} Loss: {epoch_loss:.4f} Time: {time.time()-start_time:.4f}s')
+        if i%100==0:
+            print(f'Epoch {epoch+1}/{10} Step [{i}/{len(dataloader)}] Loss: {loss.item():.4f} Time: {time.time()-last_time:.4f}s TotalTime: {time.time()-start_time:.4f}s')
+            last_time = time.time()
+    
+    epoch_loss = running_loss / len(dataloader)
+    loss_values.append(epoch_loss)
+
+# Save the model
+torch.save(model.state_dict(), 'E:\style_model\model.pth')
+
+# Plot the loss values
+plt.plot(loss_values)
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Loss vs. No. of epochs')
+plt.show()
