@@ -32,7 +32,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 loss_values = []  # to store loss values
-for epoch in range(3):  # 这里我们只训练10轮，你可以根据需要调整
+for epoch in range(3):
     running_loss = 0.0
     start_time = time.time()
     last_time = time.time()
